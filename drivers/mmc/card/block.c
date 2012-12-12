@@ -2122,8 +2122,11 @@ static int mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *rqc)
 		} else
 			areq = NULL;
 		areq = mmc_start_req(card->host, areq, (int *) &status);
-		if (!areq)
+		if (!areq) {
+			if (status == MMC_BLK_NEW_REQUEST)
+				mq->flags |= MMC_QUEUE_NEW_REQUEST;
 			return 0;
+		}
 
 		mq_rq = container_of(areq, struct mmc_queue_req, mmc_active);
 		brq = &mq_rq->brq;
@@ -2132,6 +2135,8 @@ static int mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *rqc)
 		mmc_queue_bounce_post(mq_rq);
 
 		switch (status) {
+		case MMC_BLK_NEW_REQUEST:
+			BUG(); /* should never get here */
 		case MMC_BLK_SUCCESS:
 		case MMC_BLK_PARTIAL:
 			/*
@@ -2288,6 +2293,7 @@ static int mmc_blk_issue_rq(struct mmc_queue *mq, struct request *req)
 
 	mmc_blk_write_packing_control(mq, req);
 
+	mq->flags &= ~MMC_QUEUE_NEW_REQUEST;
 	if (req && req->cmd_flags & REQ_SANITIZE) {
 		/* complete ongoing async transfer before issuing sanitize */
 		if (card->host && card->host->areq)
@@ -2312,7 +2318,7 @@ static int mmc_blk_issue_rq(struct mmc_queue *mq, struct request *req)
 	}
 
 out:
-	if (!req) {
+	if (!req && !(mq->flags & MMC_QUEUE_NEW_REQUEST)) {
 		if (mmc_card_need_bkops(card))
 			mmc_start_bkops(card, false);
 		/* release host only when there are no more requests */
