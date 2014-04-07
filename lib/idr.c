@@ -381,7 +381,7 @@ static void sub_remove(struct idr *idp, int shift, int id)
 	n = id & IDR_MASK;
 	if (likely(p != NULL && test_bit(n, &p->bitmap))){
 		__clear_bit(n, &p->bitmap);
-		rcu_assign_pointer(p->ary[n], NULL);
+		RCU_INIT_POINTER(p->ary[n], NULL);
 		to_free = NULL;
 		while(*paa && ! --((**paa)->count)){
 			if (to_free)
@@ -462,7 +462,7 @@ void idr_remove_all(struct idr *idp)
 
 	n = idp->layers * IDR_BITS;
 	p = idp->top;
-	rcu_assign_pointer(idp->top, NULL);
+	RCU_INIT_POINTER(idp->top, NULL);
 	max = idr_max(idp->layers);
 
 	id = 0;
