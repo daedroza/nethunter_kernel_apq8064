@@ -410,6 +410,11 @@ void idr_remove(struct idr *idp, int id)
 	/* Mask off upper bits we don't use for the search. */
 	id &= MAX_ID_MASK;
 
+	if (id > idr_max(idp->layers)) {
+		idr_remove_warning(id);
+		return;
+	}
+
 	sub_remove(idp, (idp->layers - 1) * IDR_BITS, id);
 	if (idp->top && idp->top->count == 1 && (idp->layers > 1) &&
 	    idp->top->ary[0]) {
@@ -906,6 +911,9 @@ void ida_remove(struct ida *ida, int id)
 	int offset = id % IDA_BITMAP_BITS;
 	int n;
 	struct ida_bitmap *bitmap;
+
+	if (idr_id > idr_max(ida->idr.layers))
+		goto err;
 
 	/* clear full bits while looking up the leaf idr_layer */
 	while ((shift > 0) && p) {
