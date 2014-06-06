@@ -673,14 +673,14 @@ void *idr_replace(struct idr *idp, void *ptr, int id)
 
 	p = idp->top;
 	if (!p)
-		return ERR_PTR(-EINVAL);
+		return ERR_PTR(-ENOENT);
 
 	n = (p->layer+1) * IDR_BITS;
 
 	id &= MAX_ID_MASK;
 
 	if (id >= (1 << n))
-		return ERR_PTR(-EINVAL);
+		return ERR_PTR(-ENOENT);
 
 	n -= IDR_BITS;
 	while ((n > 0) && p) {
