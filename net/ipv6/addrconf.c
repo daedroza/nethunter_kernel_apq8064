@@ -334,7 +334,7 @@ void in6_dev_finish_destroy(struct inet6_dev *idev)
 	WARN_ON(idev->mc_list != NULL);
 
 #ifdef NET_REFCNT_DEBUG
-	printk(KERN_DEBUG "in6_dev_finish_destroy: %s\n", dev ? dev->name : "NIL");
+	pr_debug("in6_dev_finish_destroy: %s\n", dev ? dev->name : "NIL");
 #endif
 	dev_put(dev);
 	if (!idev->dead) {
@@ -408,9 +408,9 @@ static struct inet6_dev * ipv6_add_dev(struct net_device *dev)
 
 #if defined(CONFIG_IPV6_SIT) || defined(CONFIG_IPV6_SIT_MODULE)
 	if (dev->type == ARPHRD_SIT && (dev->priv_flags & IFF_ISATAP)) {
-		printk(KERN_INFO
+		ADBG((KERN_INFO
 		       "%s: Disabled Multicast RS\n",
-		       dev->name);
+		       dev->name));
 		ndev->cnf.rtr_solicits = 0;
 	}
 #endif
@@ -548,7 +548,7 @@ void inet6_ifa_finish_destroy(struct inet6_ifaddr *ifp)
 	WARN_ON(!hlist_unhashed(&ifp->addr_lst));
 
 #ifdef NET_REFCNT_DEBUG
-	printk(KERN_DEBUG "inet6_ifa_finish_destroy\n");
+	pr_debug("inet6_ifa_finish_destroy\n");
 #endif
 
 	in6_dev_put(ifp->idev);
@@ -853,8 +853,8 @@ retry:
 	in6_dev_hold(idev);
 	if (idev->cnf.use_tempaddr <= 0) {
 		write_unlock(&idev->lock);
-		printk(KERN_INFO
-			"ipv6_create_tempaddr(): use_tempaddr is disabled.\n");
+		ADBG((KERN_INFO
+			"ipv6_create_tempaddr(): use_tempaddr is disabled.\n"));
 		in6_dev_put(idev);
 		ret = -1;
 		goto out;
@@ -864,8 +864,8 @@ retry:
 		idev->cnf.use_tempaddr = -1;	/*XXX*/
 		spin_unlock_bh(&ifp->lock);
 		write_unlock(&idev->lock);
-		printk(KERN_WARNING
-			"ipv6_create_tempaddr(): regeneration time exceeded. disabled temporary address support.\n");
+		ADBG((KERN_WARNING
+			"ipv6_create_tempaddr(): regeneration time exceeded. disabled temporary address support.\n"));
 		in6_dev_put(idev);
 		ret = -1;
 		goto out;
@@ -875,8 +875,8 @@ retry:
 	if (__ipv6_try_regen_rndid(idev, tmpaddr) < 0) {
 		spin_unlock_bh(&ifp->lock);
 		write_unlock(&idev->lock);
-		printk(KERN_WARNING
-			"ipv6_create_tempaddr(): regeneration of randomized interface id failed.\n");
+		ADBG((KERN_WARNING
+			"ipv6_create_tempaddr(): regeneration of randomized interface id failed.\n"));
 		in6_ifa_put(ifp);
 		in6_dev_put(idev);
 		ret = -1;
@@ -927,8 +927,8 @@ retry:
 	if (IS_ERR(ift)) {
 		in6_ifa_put(ifp);
 		in6_dev_put(idev);
-		printk(KERN_INFO
-			"ipv6_create_tempaddr(): retry temporary address regeneration.\n");
+		ADBG((KERN_INFO
+			"ipv6_create_tempaddr(): retry temporary address regeneration.\n"));
 		tmpaddr = &addr;
 		write_lock(&idev->lock);
 		goto retry;
@@ -1486,8 +1486,8 @@ void addrconf_dad_failure(struct inet6_ifaddr *ifp)
 			/* DAD failed for link-local based on MAC address */
 			idev->cnf.disable_ipv6 = 1;
 
-			printk(KERN_INFO "%s: IPv6 being disabled!\n",
-				ifp->idev->dev->name);
+			ADBG((KERN_INFO "%s: IPv6 being disabled!\n",
+				ifp->idev->dev->name));
 		}
 	}
 
@@ -1717,9 +1717,9 @@ static void ipv6_regen_rndid(unsigned long data)
 		idev->cnf.regen_max_retry * idev->cnf.dad_transmits * idev->nd_parms->retrans_time -
 		idev->cnf.max_desync_factor * HZ;
 	if (time_before(expires, jiffies)) {
-		printk(KERN_WARNING
+		ADBG((KERN_WARNING
 			"ipv6_regen_rndid(): too short regeneration interval; timer disabled for %s.\n",
-			idev->dev->name);
+			idev->dev->name));
 		goto out;
 	}
 
@@ -2497,7 +2497,7 @@ static void init_loopback(struct net_device *dev)
 	ASSERT_RTNL();
 
 	if ((idev = ipv6_find_idev(dev)) == NULL) {
-		printk(KERN_DEBUG "init loopback: add_dev failed\n");
+		ADBG((KERN_DEBUG "init loopback: add_dev failed\n"));
 		return;
 	}
 
@@ -2605,7 +2605,7 @@ static void addrconf_sit_config(struct net_device *dev)
 	 */
 
 	if ((idev = ipv6_find_idev(dev)) == NULL) {
-		printk(KERN_DEBUG "init sit: add_dev failed\n");
+		ADBG((KERN_DEBUG "init sit: add_dev failed\n"));
 		return;
 	}
 
@@ -2640,7 +2640,7 @@ static void addrconf_gre_config(struct net_device *dev)
 	ASSERT_RTNL();
 
 	if ((idev = ipv6_find_idev(dev)) == NULL) {
-		printk(KERN_DEBUG "init gre: add_dev failed\n");
+		ADBG((KERN_DEBUG "init gre: add_dev failed\n"));
 		return;
 	}
 
@@ -2680,7 +2680,7 @@ static void ip6_tnl_add_linklocal(struct inet6_dev *idev)
 		if (!ipv6_inherit_linklocal(idev, link_dev))
 			return;
 	}
-	printk(KERN_DEBUG "init ip6-ip6: add_linklocal failed\n");
+	ADBG((KERN_DEBUG "init ip6-ip6: add_linklocal failed\n"));
 }
 
 /*
@@ -2696,7 +2696,7 @@ static void addrconf_ip6_tnl_config(struct net_device *dev)
 
 	idev = addrconf_add_dev(dev);
 	if (IS_ERR(idev)) {
-		printk(KERN_DEBUG "init ip6-ip6: add_dev failed\n");
+		ADBG((KERN_DEBUG "init ip6-ip6: add_dev failed\n"));
 		return;
 	}
 	ip6_tnl_add_linklocal(idev);
@@ -2727,10 +2727,10 @@ static int addrconf_notify(struct notifier_block *this, unsigned long event,
 		if (event == NETDEV_UP) {
 			if (!addrconf_qdisc_ok(dev)) {
 				/* device is not ready yet. */
-				printk(KERN_INFO
+				ADBG((KERN_INFO
 					"ADDRCONF(NETDEV_UP): %s: "
 					"link is not ready\n",
-					dev->name);
+					dev->name));
 				break;
 			}
 
@@ -2754,10 +2754,10 @@ static int addrconf_notify(struct notifier_block *this, unsigned long event,
 				idev->if_flags |= IF_READY;
 			}
 
-			printk(KERN_INFO
+			ADBG((KERN_INFO
 					"ADDRCONF(NETDEV_CHANGE): %s: "
 					"link becomes ready\n",
-					dev->name);
+					dev->name));
 
 			run_pending = 1;
 		}
@@ -3030,8 +3030,8 @@ static void addrconf_rs_timer(unsigned long data)
 		 * Note: we do not support deprecated "all on-link"
 		 * assumption any longer.
 		 */
-		printk(KERN_DEBUG "%s: no IPv6 routers present\n",
-		       idev->dev->name);
+		ADBG((KERN_DEBUG "%s: no IPv6 routers present\n",
+		       idev->dev->name));
 	}
 
 out:
@@ -4967,8 +4967,8 @@ int __init addrconf_init(void)
 
 	err = ipv6_addr_label_init();
 	if (err < 0) {
-		printk(KERN_CRIT "IPv6 Addrconf:"
-		       " cannot initialize default policy table: %d.\n", err);
+		ADBG((KERN_CRIT "IPv6 Addrconf:"
+		       " cannot initialize default policy table: %d.\n", err));
 		goto out;
 	}
 
