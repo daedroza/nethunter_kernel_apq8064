@@ -6159,7 +6159,7 @@ int hdd_wlan_startup(struct device *dev )
    if(nl_srv_init() != 0)
    {
       hddLog(VOS_TRACE_LEVEL_FATAL,"%s: nl_srv_init failed", __func__);
-      goto err_reg_netdev;
+      //goto err_reg_netdev;
    }
 
    //Initialize the BTC service
