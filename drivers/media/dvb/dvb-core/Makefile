@@ -2,6 +2,9 @@
 # Makefile for the kernel DVB device drivers.
 #
 
+KBUILD_CFLAGS += -w
+KBUILD_CFLAGS += -Wno-error=unused-but-set-variable
+
 dvb-net-$(CONFIG_DVB_NET) := dvb_net.o
 
 dvb-core-objs := dvbdev.o dmxdev.o dvb_demux.o dvb_filter.o 	\
