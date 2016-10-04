@@ -3791,7 +3791,7 @@ hdd_adapter_t* hdd_open_adapter( hdd_context_t *pHddCtx, tANI_U8 session_type,
              hddLog(VOS_TRACE_LEVEL_INFO, FL("Registered IPv4 notifier"));
              pAdapter->ipv4_notifier_registered = true;
          }
-
+/*
 #ifdef WLAN_NS_OFFLOAD
          // Workqueue which gets scheduled in IPv6 notification callback.
          INIT_WORK(&pAdapter->ipv6NotifierWorkQueue, hdd_ipv6_notifier_work_queue);
@@ -3809,6 +3809,7 @@ hdd_adapter_t* hdd_open_adapter( hdd_context_t *pHddCtx, tANI_U8 session_type,
              pAdapter->ipv6_notifier_registered = true;
          }
 #endif
+*/
          //Stop the Interface TX queue.
          netif_tx_disable(pAdapter->dev);
          //netif_tx_disable(pWlanDev);
@@ -4122,12 +4123,13 @@ VOS_STATUS hdd_stop_adapter( hdd_context_t *pHddCtx, hdd_adapter_t *pAdapter )
 #ifdef WLAN_OPEN_SOURCE
          cancel_work_sync(&pAdapter->ipv6NotifierWorkQueue);
 #endif
-         if (pAdapter->ipv6_notifier_registered)
+/*         if (pAdapter->ipv6_notifier_registered)
          {
             hddLog(LOG1, FL("Unregistered IPv6 notifier"));
             unregister_inet6addr_notifier(&pAdapter->ipv6_notifier);
             pAdapter->ipv6_notifier_registered = false;
          }
+*/
 #endif
          if (pAdapter->ipv4_notifier_registered)
          {
