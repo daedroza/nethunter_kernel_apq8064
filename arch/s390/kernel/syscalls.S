@@ -27,7 +27,7 @@ SYSCALL(sys_chmod,sys_chmod,sys32_chmod_wrapper)		/* 15 */
 SYSCALL(sys_lchown16,sys_ni_syscall,sys32_lchown16_wrapper)	/* old lchown16 syscall*/
 NI_SYSCALL							/* old break syscall holder */
 NI_SYSCALL							/* old stat syscall holder */
-SYSCALL(sys_lseek,sys_lseek,sys32_lseek_wrapper)
+SYSCALL(sys_lseek,sys_lseek,compat_sys_lseek)
 SYSCALL(sys_getpid,sys_getpid,sys_getpid)			/* 20 */
 SYSCALL(sys_mount,sys_mount,sys32_mount_wrapper)
 SYSCALL(sys_oldumount,sys_oldumount,sys32_oldumount_wrapper)
@@ -336,9 +336,9 @@ SYSCALL(sys_inotify_init1,sys_inotify_init1,sys_inotify_init1_wrapper)
 SYSCALL(sys_pipe2,sys_pipe2,sys_pipe2_wrapper) /* 325 */
 SYSCALL(sys_dup3,sys_dup3,sys_dup3_wrapper)
 SYSCALL(sys_epoll_create1,sys_epoll_create1,sys_epoll_create1_wrapper)
-SYSCALL(sys_preadv,sys_preadv,compat_sys_preadv_wrapper)
-SYSCALL(sys_pwritev,sys_pwritev,compat_sys_pwritev_wrapper)
-SYSCALL(sys_rt_tgsigqueueinfo,sys_rt_tgsigqueueinfo,compat_sys_rt_tgsigqueueinfo_wrapper) /* 330 */
+SYSCALL(sys_preadv,sys_preadv,compat_sys_preadv)
+SYSCALL(sys_pwritev,sys_pwritev,compat_sys_pwritev)
+SYSCALL(sys_rt_tgsigqueueinfo,sys_rt_tgsigqueueinfo,compat_sys_rt_tgsigqueueinfo) /* 330 */
 SYSCALL(sys_perf_event_open,sys_perf_event_open,sys_perf_event_open_wrapper)
 SYSCALL(sys_fanotify_init,sys_fanotify_init,sys_fanotify_init_wrapper)
 SYSCALL(sys_fanotify_mark,sys_fanotify_mark,sys_fanotify_mark_wrapper)

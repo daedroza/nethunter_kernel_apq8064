@@ -174,7 +174,7 @@ static int debugfs_parse_options(char *data, struct debugfs_mount_opts *opts)
 			opts->uid = option;
 			break;
 		case Opt_gid:
-			if (match_octal(&args[0], &option))
+			if (match_int(&args[0], &option))
 				return -EINVAL;
 			opts->gid = option;
 			break;
@@ -318,7 +318,6 @@ static int debugfs_create_by_name(const char *name, umode_t mode,
 	if (!parent)
 		parent = debugfs_mount->mnt_root;
 
-	*dentry = NULL;
 	mutex_lock(&parent->d_inode->i_mutex);
 	*dentry = lookup_one_len(name, parent, strlen(name));
 	if (!IS_ERR(*dentry)) {

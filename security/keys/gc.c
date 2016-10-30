@@ -137,7 +137,7 @@ void key_gc_keytype(struct key_type *ktype)
  * deallocated under us as only our caller may deallocate it.
  */
 static void key_gc_keyring(struct key *keyring, time_t limit)
-{
+ {
 	struct keyring_list *klist;
 	int loop;
 
@@ -186,6 +186,12 @@ static noinline void key_gc_unused_keys(struct list_head *keys)
 
 		kdebug("- %u", key->serial);
 		key_check(key);
+
+		/* Throw away the key data if the key is instantiated */
+		if (test_bit(KEY_FLAG_INSTANTIATED, &key->flags) &&
+		    !test_bit(KEY_FLAG_NEGATIVE, &key->flags) &&
+		    key->type->destroy)
+			key->type->destroy(key);
 
 		security_key_free(key);
 

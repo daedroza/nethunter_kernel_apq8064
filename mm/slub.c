@@ -579,6 +579,7 @@ static void slab_bug(struct kmem_cache *s, char *fmt, ...)
 
 	va_start(args, fmt);
 	vsnprintf(buf, sizeof(buf), fmt, args);
+	add_taint(TAINT_BAD_PAGE, LOCKDEP_NOW_UNRELIABLE);
 	va_end(args);
 	printk(KERN_ERR "========================================"
 			"=====================================\n");
